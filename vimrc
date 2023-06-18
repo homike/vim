@@ -15,6 +15,7 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 "Plugin 'Shougo/neocomplcache.vim'
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'rhysd/vim-clang-format'
 
 " [colorscheme]
 Plugin 'sickill/vim-monokai'
@@ -23,7 +24,8 @@ Plugin 'altercation/vim-colors-solarized'
 
 " [go]
 Plugin 'fatih/vim-go'
-Plugin 'nsf/gocode', {'rtp': 'vim/'}
+"Plugin 'nsf/gocode', {'rtp': 'vim/'}
+Plugin 'buoto/gotests-vim'
 
 Plugin 'rking/ag.vim'
 Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -31,17 +33,18 @@ Plugin 'junegunn/fzf.vim'
 Plugin 'wsdjeg/FlyGrep.vim'
 
 Plugin 'MattesGroeger/vim-bookmarks'
+Plugin 'tbastos/vim-lua'
 
 "Plugin 'ctrlpvim/ctrlp.vim'
 "Plugin 'Chun-Yang/vim-action-ag'
 "Plugin 'Yggdroot/LeaderF', { 'do': '.\install.bat' }
 
 " [cpp]
-Plugin 'octol/vim-cpp-enhanced-highlight'
-Plugin 'vim-scripts/a.vim'
-Plugin 'SirVer/ultisnips'
+"Plugin 'octol/vim-cpp-enhanced-highlight'
+"Plugin 'vim-scripts/a.vim'
+"Plugin 'SirVer/ultisnips'
 """go to define test
-Plugin 'chxuan/cpp-mode'
+"Plugin 'chxuan/cpp-mode'
 
 " [csharp]
 "Plugin 'Chiel92/vim-autoformat'
@@ -51,9 +54,8 @@ Plugin 'chxuan/cpp-mode'
 
 " [other]
 "Plugin 'godlygeek/tabular'
-"Plugin 'plasticboy/vim-markdown'
-Plugin 'rdnetto/YCM-Generator'
-
+Plugin 'plasticboy/vim-markdown'
+"Plugin 'rdnetto/YCM-Generator'
 
 call vundle#end()
 filetype plugin indent on
@@ -100,11 +102,18 @@ map <C-j> :Tagbar<CR>
 let NERDTreeWinPos = 'left'
 let NERDTreeWinSize = 25
 let NERDTreeIgnore = ['\.pyc']
-map <C-h> :NERDTreeToggle<CR>
+map <C-u> :NERDTreeToggle<CR>
 
 " [tab]
 map <C-l> :tabn<CR>
 map <C-k> :tabnew<CR>
+
+" [buffer]
+map <C-n> :bnext<CR>
+map <C-b> :bprevious<CR>
+" Close the current buffer and move to the previous one
+" " This replicates the idea of closing a tab
+map <C-w> :bp <BAR> bd #<CR>
 
 " [fzf]
 map <C-p> :Files<CR>
@@ -115,6 +124,8 @@ let g:airline_powerline_fonts = 0
 let g:airline_theme = 'bubblegum'
 let g:airline#extensions#whitespace#enabled = 0
 let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
+"let g:airline#extensions#tabline#show_buffers = 0
 
 " [cpp build]
 map <C-a> :call CppBuild()<CR>
@@ -123,11 +134,19 @@ function CppBuild()
 endfunction
 
 " [Ag]
-map <C-r> :norm yiw<CR>:Ag! -t -Q -w "<C-R>""
-map <C-x> :norm yiw<CR>:/<C-R>"\>
+""map <C-r> :norm yiw<CR>:Ag! --go -t -w "<C-R>""
+map <C-r> :norm yiw<CR>:Ag --ignore-dir={robot,ntools,pb} --go -w "<C-R>"" <CR>
 
-nnoremap <silent> <leader>g :vimgrep/<C-R><C-W>/**/*.go <CR> :cw <CR>
-"map <C-g> :norm yiw<CR>:/<C-R>"
+map <C-x> :norm yiw<CR>:/\<<C-R>"\>
+
+"nnoremap <silent> <leader>g :vimgrep/<C-R><C-W>/**/*.go <CR> :cw <CR>
+""map <C-g> :norm yiw<CR>:/<C-R>"
+
+" [terminal]
+"map <C-g> :vs ter ++rows=10<CR>
+map <C-g> :vert ter<CR>
+"map <C-g> :vertical topright terminal<CR>
+"map <C-g> :vert copen<CR>
 
 " [cpp format]
 "let g:formatdef_my_cpp = '"astyle --style=attach --pad-oper --lineend=linux"'
@@ -135,15 +154,22 @@ nnoremap <silent> <leader>g :vimgrep/<C-R><C-W>/**/*.go <CR> :cw <CR>
 "au BufWrite * :Autoformat
 
 " [ycm]
-" close function prompt
-let g:ycm_auto_hover='' 
+"let g:ycm_gopls_args = ['-remote=auto']
+"let g:ycm_gopls_binary_path = [$GOPATH.'/gopls']
+"
+" <<<close function prompt>>>
+"let g:ycm_auto_hover='' 
+"let g:ycm_semantic_triggers =  {
+"  \   'go' : ['.' , 're!\w{2}'],
+"  \ }
 
-let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
-let g:ycm_collect_identifiers_from_tags_files = 1
-let g:ycm_confirm_extra_conf=0
-let g:ycm_collect_identifiers_from_comments_and_strings = 1
-let g:ycm_complete_in_strings=1
-map <C-i> :GoToFunImpl<CR>
+" <<<ycm remove>>>
+"let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+"let g:ycm_collect_identifiers_from_tags_files = 1
+"let g:ycm_confirm_extra_conf=0
+"let g:ycm_collect_identifiers_from_comments_and_strings = 1
+"let g:ycm_complete_in_strings=1
+"map <C-i> :GoToFunImpl<CR>
 
 "function GotoDefine()
 "    redir => s:messages
@@ -158,9 +184,6 @@ map <C-i> :GoToFunImpl<CR>
 "
 "endfunction
 "map <c-]> :call GotoDefine()<CR>
-let g:ycm_semantic_triggers =  {
-  \   'go' : ['.' , 're!\w{2}'],
-  \ }
 
 " [golang]
 let g:go_highlight_functions = 1
@@ -169,23 +192,50 @@ let g:go_highlight_fields = 1
 let g:go_highlight_types = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
-let g:go_fmt_command = "goimports"
 
-let g:go_def_mode = 'gopls'
-let g:go_info_mode ='gopls'
-" let g:go_referrers_mode = 'gopls'
+"let g:go_fmt_command = "goimports"
+"let g:go_def_mode='gopls'
+"let g:go_info_mode='gopls'
 
+" auto save
+"let g:go_referrers_mode='gopls'
+"let g:go_metalinter_autosave = 1
+"let g:go_metalinter_enabled = ['errcheck']
+
+" vim-go
+"let g:go_gopls_options = ['-remote=auto']
+ 
+" vim-gotests
+let g:gotests_template_dir = ''
+let g:gotests_template = ''
+
+let mapleader = ","
 au FileType go nmap <leader>r <Plug>(go-run)
 au FileType go nmap <leader>b <Plug>(go-build)
-au FileType go nmap <leader>t <Plug>(go-test)
-au FileType go nmap <leader>c <Plug>(go-coverage)
+au FileType go nmap <leader>t <Plug>(go-test -v *.go)
+"au FileType go nmap <leader>c <Plug>(go-coverage)
+"au FileType go nmap <leader>e :GoReferrers<CR> 
+au FileType go nmap <leader>e :GoReferrers <CR> 
+au FileType go nmap <leader>tf :GoTests<CR>
+au FileType go nmap <leader>ta :GoTestsAll<CR>
+"au FileType go nmap <leader>gr:GoRename<CR> 
 
-au FileType go nmap <leader>w :GoImports<CR>
+"au FileType go nmap <leader>w :GoImports<CR>
 au FileType go nmap <leader>s <Plug>(go-implements)
 
+" [protobuff]
+au FileType go nmap <leader>pb :ClangFormat<CR>
+
+" [quickfix]
+au FileType go nmap <leader>w :ccl <CR>
+au FileType go nmap <leader>cn :cn <CR>
+au FileType go nmap <leader>cp :cp <CR>
+au FileType go nmap <leader>q :lclose <CR>
+au FileType go nmap <leader>ln :lnext <CR>
+au FileType go nmap <leader>lp :lprev <CR>
 
 " [csharp]
-"let g:OmniSharp_server_use_mono = 1
+"let g:OmniSharp_server_use_mono = 0  " Use mono self
 "let g:OmniSharp_server_stdio = 1
 "let g:OmniSharp_highlight_types = 3
 "
@@ -208,13 +258,23 @@ au FileType go nmap <leader>s <Plug>(go-implements)
 "let g:ale_lint_on_enter = 0
 "let g:ale_lint_on_save = 0
 
+" [lua]
+au BufNewFile,BufRead *.lua.txt set filetype=lua
+
+" [markdown]
+let g:vim_markdown_folding_disabled = 1
+
+" [clang-format]
+"autocmd BufWritePre *.proto :ClangFormat
+"
+"
 " [basic]
 syntax on
 syntax enable
 
 set completeopt=longest,menu
 set cscopequickfix=s-,c-,d-,i-,t-,e-
-set number
+"set number
 set ruler
 set tabstop=4
 set softtabstop=4
@@ -229,6 +289,9 @@ set hlsearch
 set incsearch
 set ic
 set maxmempattern=10000
+" 设置下方分割
+" set nosplitright 
+" set splitbelow
 
 nnoremap <space> za
 
